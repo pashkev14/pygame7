@@ -4,8 +4,8 @@ import os
 
 
 FPS = 50
-WIDTH = 550
-HEIGHT = 550
+WIDTH = 300
+HEIGHT = 300
 
 
 def load_image(name, colorkey=None):
@@ -103,10 +103,23 @@ class Player(pygame.sprite.Sprite):
             self.rect.y = backup_y
 
 
+class Camera:
+    def __init__(self):
+        self.dx = 0
+        self.dy = 0
+
+    def apply(self, obj):
+        obj.rect.x += self.dx
+        obj.rect.y += self.dy
+
+    def update(self, target):
+        self.dx = -(target.rect.x + target.rect.w // 2 - WIDTH // 2)
+        self.dy = -(target.rect.y + target.rect.h // 2 - HEIGHT // 2)
+
+
 if __name__ == '__main__':
-    load_map = input()
     pygame.init()
-    pygame.display.set_caption('Перемещение героя с уровнями')
+    pygame.display.set_caption('Перемещение героя. Камера')
     size = WIDTH, HEIGHT
     screen = pygame.display.set_mode(size)
     clock = pygame.time.Clock()
@@ -121,7 +134,8 @@ if __name__ == '__main__':
     tiles_group = pygame.sprite.Group()
     obstacles_group = pygame.sprite.Group()
     tile_width = tile_height = 50
-    player, level_x, level_y = generate_level(load_level(load_map))
+    player, level_x, level_y = generate_level(load_level('map.txt'))
+    camera = Camera()
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -135,6 +149,9 @@ if __name__ == '__main__':
                     player.move(player.rect.x - tile_width, player.rect.y)
                 elif event.key == pygame.K_RIGHT:
                     player.move(player.rect.x + tile_width, player.rect.y)
+        camera.update(player)
+        for sprite in all_sprites:
+            camera.apply(sprite)
         tiles_group.draw(screen)
         obstacles_group.draw(screen)
         player_group.draw(screen)
