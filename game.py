@@ -156,3 +156,4 @@ if __name__ == '__main__':
         obstacles_group.draw(screen)
         player_group.draw(screen)
         pygame.display.flip()
+# task 3
